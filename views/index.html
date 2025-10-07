@@ -2,21 +2,23 @@
 <html>
 
 <head>
-    <title>Input Pengguna</title>
+    <meta charset="UTF-8">
+    <title>Input Data Pengguna</title>
 </head>
 
 <body>
     <h2>Form Data Pengguna</h2>
     <form action="/add" method="POST" enctype="multipart/form-data">
         <label>Nama:</label><br>
-        <input type="text" name="name" required><br>
+        <input type="text" name="name" required><br><br>
         <label>Email:</label><br>
-        <input type="email" name="email" required><br>
+        <input type="email" name="email" required><br><br>
         <label>Foto Profil:</label><br>
         <input type="file" name="photo" accept="image/*"><br><br>
         <button type="submit">Simpan</button>
     </form>
-    <a href="/users">Lihat Data</a>
+    <br>
+    <a href="/users">Lihat Data Pengguna</a>
 </body>
 
 </html>

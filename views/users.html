@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Data Pengguna</title>
+</head>
+
+<body>
+    <h2>Daftar Pengguna</h2>
+    <ul id="user-list"></ul>
+    <a href="/">Kembali</a>
+
+    <script>
+        async function loadUsers() {
+            const res = await fetch('/api/users');
+            const data = await res.json();
+            const list = document.getElementById('user-list');
+            list.innerHTML = '';
+            data.forEach(u => {
+                const li = document.createElement('li');
+                li.innerHTML = `${u.name} (${u.email})<br>` +
+                    (u.photo ? `<img src="/uploads/${u.photo}" width="100">` : '');
+                list.appendChild(li);
+            });
+        }
+        loadUsers();
+    </script>
+</body>
+
+</html>
