@@ -1,30 +1,192 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pengguna</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 50%, #1a0b2e 100%);
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(88, 28, 135, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.15);
+        }
+
+        .glass-item {
+            background: rgba(139, 92, 246, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-item:hover {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: rgba(168, 85, 247, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-purple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(168, 85, 247, 0.6);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+        }
+
+        .avatar {
+            border: 3px solid rgba(168, 85, 247, 0.4);
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .empty-state {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
 </head>
 
-<body>
-    <h2>Daftar Pengguna</h2>
-    <ul id="user-list"></ul>
-    <a href="/">Kembali</a>
-
+<body class="font-sans">
+    <div class="min-h-screen p-4 md:p-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl md:text-5xl font-bold text-purple-100 glow-text mb-2">
+                    Daftar Pengguna
+                </h1>
+                <p class="text-purple-300 text-lg">Semua data pengguna yang terdaftar</p>
+            </div>
+            <div class="glass-card rounded-2xl p-4 mb-6 flex justify-between items-center">
+                <div class="text-purple-200">
+                    <span class="font-semibold">Total: </span>
+                    <span id="total-users" class="text-purple-100 font-bold">0</span> pengguna
+                </div>
+                <a href="/"
+                    class="btn-purple px-6 py-2 rounded-xl text-white font-semibold inline-flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                            d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                    </svg>
+                    Kembali
+                </a>
+            </div>
+            <div id="loading" class="glass-card rounded-2xl p-12 text-center loading">
+                <div class="text-purple-300 text-xl">⏳ Memuat data...</div>
+            </div>
+            <div id="empty-state" class="glass-card rounded-2xl p-12 text-center hidden empty-state">
+                <div class="text-6xl mb-4">📭</div>
+                <div class="text-purple-300 text-xl mb-2">Belum ada data pengguna</div>
+                <div class="text-purple-400">Silakan tambahkan pengguna baru</div>
+            </div>
+            <div id="user-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+            </div>
+        </div>
+    </div>
     <script>
         async function loadUsers() {
-            const res = await fetch('/api/users');
-            const data = await res.json();
-            const list = document.getElementById('user-list');
-            list.innerHTML = '';
-            data.forEach(u => {
-                const li = document.createElement('li');
-                li.innerHTML = `${u.name} (${u.email})<br>` +
-                    (u.photo ? `<img src="/uploads/${u.photo}" width="100">` : '');
-                list.appendChild(li);
-            });
+            const loading = document.getElementById('loading');
+            const emptyState = document.getElementById('empty-state');
+            const userList = document.getElementById('user-list');
+            const totalUsers = document.getElementById('total-users');
+            try {
+                const res = await fetch('/api/users');
+                const data = await res.json();
+                loading.classList.add('hidden');
+                totalUsers.textContent = data.length;
+                if (data.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+                userList.classList.remove('hidden');
+                userList.innerHTML = '';
+                data.forEach(user => {
+                    const card = document.createElement('div');
+                    card.className = 'glass-item rounded-2xl p-6';
+                    const photoHtml = user.photo
+                        ? `<img src="/uploads/${user.photo}" alt="${user.name}" class="w-24 h-24 rounded-full object-cover avatar mx-auto">`
+                        : `<div class="w-24 h-24 rounded-full avatar mx-auto bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-3xl font-bold">
+                            ${user.name.charAt(0).toUpperCase()}
+                           </div>`;
+                    const dateCreated = user.created_at
+                        ? new Date(user.created_at).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                        })
+                        : 'Tanggal tidak tersedia';
+                    card.innerHTML = `
+                        <div class="text-center">
+                            ${photoHtml}
+                            <h3 class="text-xl font-bold text-purple-100 mt-4 mb-2">${user.name}</h3>
+                            <p class="text-purple-300 mb-1 flex items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                ${user.email}
+                            </p>
+                            <p class="text-purple-400 text-sm flex items-center justify-center gap-1 mt-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                ${dateCreated}
+                            </p>
+                        </div>
+                    `;
+                    userList.appendChild(card);
+                });
+            } catch (err) {
+                loading.classList.add('hidden');
+                userList.innerHTML = `
+                    <div class="col-span-full glass-card rounded-2xl p-12 text-center">
+                        <div class="text-red-400 text-xl">⚠️ Gagal memuat data</div>
+                        <div class="text-purple-300 mt-2">${err.message}</div>
+                    </div>
+                `;
+                userList.classList.remove('hidden');
+            }
         }
         loadUsers();
+        setInterval(loadUsers, 30000);
     </script>
 </body>
 

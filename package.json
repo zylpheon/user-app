@@ -1,15 +1,30 @@
 {
   "name": "user-app",
   "version": "1.0.0",
+  "description": "Modern User Management System with PostgreSQL",
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [
+    "express",
+    "postgresql",
+    "user-management",
+    "multer",
+    "file-upload"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
   "dependencies": {
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "multer": "^1.4.5-lts.1",
-    "pg": "^8.11.3"
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "pg": "^8.16.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
